@@ -1,0 +1,14 @@
+.ipynb_checkpoints
+*.ipynb
+.vscode/
+.idea/
+*.pytest_cache
+*.log
+__pycache__/
+.cache/
+asset/checkpoints/*
+!asset/checkpoints/.gitkeep
+*.pth
+*.jpg
+*.png
+venv

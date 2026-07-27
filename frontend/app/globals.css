@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------
+   Design tokens, extracted from the Figma export. In Tailwind v4 these
+   are declared directly in CSS via @theme instead of tailwind.config.js.
+   Every custom property below becomes a Tailwind utility automatically,
+   e.g. --color-accent -> bg-accent / text-accent / border-accent,
+   --radius-card -> rounded-card, --shadow-card -> shadow-card.
+   --font-sans below is wired to the CSS variable next/font/google injects
+   in layout.js (--font-plus-jakarta-sans) — no @import url(...) needed,
+   which avoids Turbopack's stricter @import-ordering requirement entirely.
+   --------------------------------------------------------------------- */
+@theme {
+    /* Page background gradient stops */
+    --color-bg-from: #222222;
+    --color-bg-to: #212020;
+
+    /* Card / panel gradient stops (angle varies 286-292deg across cards in
+       the Figma file; standardized to one angle below via .panel-surface) */
+    --color-panel-from: #272727;
+    --color-panel-to: #222222;
+    --color-panel-alt: #252525; /* live-feed frame panel */
+
+    /* Signature accent (non-conforming highlights, glows, checks) */
+    --color-accent: #c0ff89;
+    --color-accent-soft: #b4ff8c;
+
+    /* Text scale, darkest -> lightest role */
+    --color-text-heading: #d8d8d8;
+    --color-text-title: #d3d3d3;
+    --color-text-body: #b4b4b4;
+    --color-text-muted: #b3b3b3;
+    --color-text-faint: #a8a8a8;
+    --color-text-stat: #d0d0d0;
+
+    /* Row / pill fill used in inputs, list rows, roche cards */
+    --color-field: rgba(94, 94, 94, 0.1);
+
+    /* Chart grid lines */
+    --color-grid-dashed: rgba(161, 161, 161, 0.23);
+    --color-grid-solid: #a1a1a1;
+
+    /* Fonts (variable set by next/font/google in layout.js). The fallback
+       inside var() itself matters: if --font-plus-jakarta-sans is ever
+       missing, an unfallback-ed var() invalidates the WHOLE declaration
+       (including the sans-serif after it), silently dropping to the
+       browser default serif font with no visible error. */
+    --font-sans: var(--font-plus-jakarta-sans, "Plus Jakarta Sans"), sans-serif;
+    --font-mono: "Inter", sans-serif;
+
+    /* Radii */
+    --radius-card: 21px;  /* stat cards, dimensions panel */
+    --radius-panel: 25px; /* chart cards, live-feed frame */
+    --radius-xl: 30px;    /* roches sidebar */
+    --radius-input: 10px; /* dimensions panel stepper fields */
+    --radius-row: 15px;   /* roches list row pills */
+    --radius-pill: 9999px; /* reserved for fully-rounded elements, if any */
+
+    /* Shadows */
+    --shadow-card: 0 0 15px rgba(0, 0, 0, 0.25);
+    --shadow-panel: 0 0 15px rgba(0, 0, 0, 0.25);
+    --shadow-glow: 0 0 4px rgba(192, 255, 137, 0.5);
+    --shadow-row: 0 0 16.1px rgba(0, 0, 0, 0.4);
+}
+
+@layer base {
+    html,
+    body {
+        background: linear-gradient(116.11deg, var(--color-bg-from) 21.42%, var(--color-bg-to) 96.39%);
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        color: var(--color-text-body);
+    }
+
+    /* Visible keyboard focus everywhere, since the design has no default
+       browser focus ring styling defined */
+    :focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+    }
+}
+
+@layer components {
+    /* Shared card chrome reused by stat cards, chart cards, panels, etc.
+       Individual components still set their own radius/padding/width.
+       The radial-gradient layer is a subtle accent-green glow bleeding in
+       from the top-right corner — an aesthetic experiment tying every card
+       back to the app's accent color without overpowering the base gradient. */
+    .panel-surface {
+        background:
+                radial-gradient(120% 140% at 100% 0%, rgba(0, 0, 0, 0.15), transparent 60%),
+                linear-gradient(288deg, var(--color-panel-from) -2%, var(--color-panel-to) 96%);
+        box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}
