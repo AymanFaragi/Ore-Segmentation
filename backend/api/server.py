@@ -4,10 +4,12 @@ import io
 import logging
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List
-
+from backend.storage.stats_writer import StatsWriter
 
 import cv2
 static_img = cv2.imread("assets/test111.png")
+
+
 
 
 import uvicorn
@@ -156,6 +158,8 @@ async def perform_inference(
         result["status"] = STREAM_STATUS_ACTIVE
         result = await add_base64_image(result, frame)
 
+        stats_writer.append_run(result)
+
         if broadcast:
             await manager.broadcast(result)
 
@@ -205,6 +209,7 @@ async def lifespan(app: FastAPI):
 
 # Initialize global components
 inference_task = None
+stats_writer = StatsWriter()
 sam_inference = SamInference()
 app = setup_app()
 video_capture = VideoCapture()

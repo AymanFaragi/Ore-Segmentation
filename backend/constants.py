@@ -6,4 +6,6 @@ SAM_CHECKPOINT_VIT_B_PATH = Path("assets/checkpoints/sam_vit_b_01ec64.pth")
 SAM_CHECKPOINT_VIT_L_PATH = Path("assets/checkpoints/sam_vit_l_0b3195.pth")
 SAM_CHECKPOINT_VIT_H_PATH = Path("assets/checkpoints/sam_vit_h_4b8939.pth")
 
+DAILY_STATS_CSV_PATH = Path("assets/daily_stats.csv")
+
 CONFIG_YAML_PATH = Path("config.yaml")  # Path to the configuration file.

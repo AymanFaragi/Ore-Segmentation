@@ -30,7 +30,6 @@ export function DimensionsProvider({ children }) {
             } catch (err) {
                 if (!cancelled) {
                     console.error("Error fetching dimensions:", err);
-                    setError("Impossible de récupérer les dimensions depuis le serveur.");
                 }
             } finally {
                 if (!cancelled) setIsLoading(false);

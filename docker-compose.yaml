@@ -1,0 +1,74 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ore-seg-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ore-seg-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        TORCH: ${TORCH:-cpu}
+    container_name: ore-seg-backend
+    env_file:
+      - .env
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_DB: "0"
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persists raw_images / sam_output_images / checkpoints across rebuilds
+      # (checkpoints are .dockerignore'd from the image itself)
+      - ./backend/assets:/app/backend/assets
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - ore-seg-net
+    # GPU passthrough (only matters when TORCH=gpu). On Windows this works
+    # through Docker Desktop's WSL2 backend — no nvidia-container-toolkit
+    # install needed on Windows itself.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ore-seg-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_WS_URL: ws://localhost:8000/ws
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - ore-seg-net
+
+networks:
+  ore-seg-net:
+    driver: bridge
+
+volumes:
+  redis-data:

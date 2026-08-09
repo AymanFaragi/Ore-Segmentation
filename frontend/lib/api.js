@@ -2,18 +2,11 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-/**
- * GET /dimensions/ -> { dimensions: { width_cm, height_cm } }
- */
 export async function fetchSieveDimensions() {
     const response = await axios.get(`${API_BASE_URL}/dimensions/`);
     return response.data.dimensions;
 }
 
-/**
- * POST /update_dimensions/ expects form-urlencoded body (FastAPI Form(...)
- * params), not JSON — matching server.py exactly.
- */
 export async function saveSieveDimensions(widthCm, heightCm) {
     const params = new URLSearchParams();
     params.append("sieve_width_cm", widthCm);
