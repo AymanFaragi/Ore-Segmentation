@@ -1,0 +1,20 @@
+# GPU overlay — only apply this on a machine with nvidia-container-toolkit
+# (or Docker Desktop's WSL2 GPU passthrough) configured.
+#
+# Usage:
+#   TORCH=gpu docker compose -f docker-compose.yaml -f docker-compose.gpu.yaml up --build
+#
+# Kept separate from the base compose file on purpose: the base file must
+# stay runnable on a plain CPU machine with a bare `docker compose up`,
+# and an unconditional `deploy.reservations.devices` block there would
+# fail startup on any host without an NVIDIA runtime.
+
+services:
+  backend:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
